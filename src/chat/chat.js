@@ -4,10 +4,14 @@ import{process} from "../store/action/index";
 import React, {useState, useEffect, useRef} from "react";
 import { useDispatch } from "react-redux";
 
-function Chat({username, roomname, socket, token}){
+function Chat(props){
    const[text, setText] = useState("");
    const [messages, setMessages] = useState([]);
-   const tokenID = {token};
+ 
+
+   const url = window.location.search;
+   const urlParams = new URLSearchParams(url);
+   const idInitial = urlParams.get('id');
 
    const dispatch = useDispatch();
 
@@ -16,7 +20,8 @@ function Chat({username, roomname, socket, token}){
    };
 
    useEffect(()=>{
-      socket.on("message",(data)=>{
+      props.socket.on("message",(data)=>{
+         //const ans = to_Decrypt(data.text, data.username);
          const ans = to_Decrypt(data.text, data.username);
          dispatchProcess(false, ans, data.text);
          console.log(ans);
@@ -31,12 +36,15 @@ function Chat({username, roomname, socket, token}){
 
       });
    
-   },[socket]);
+   },[props.socket]);
 
+   //also send the room of the user
    const sendData = () =>{
       if(text !== ""){
          const ans = to_Encrypt(text);
-         socket.emit("chat", ans);
+         const sendInfo = { messageEncrypted: { ans }, id: props.id , room: props.roomname};
+         console.log(ans);
+         props.socket.emit("chat", sendInfo);
          setText("");
 
       }
@@ -56,14 +64,14 @@ function Chat({username, roomname, socket, token}){
       <div className="chat">
          <div className="user-name">
             <h2>
-               {username} <span style ={{fontSize: ".07rem"}}>
-                  in {roomname}
+               {props.username} <span style ={{fontSize: ".07rem"}}>
+                  in {props.roomname}
                </span>
             </h2>
          </div>
          <div className="chat-message">
             {messages.map((i)=>{
-               if(i.username ===username){
+               if(i.username === props.username){
                   return(
                      <div className="message">
                         <p>{i.text}</p>

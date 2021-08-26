@@ -9,6 +9,11 @@ const socket = io.connect('/');
 
 
 function ChatMain(props) {
+   const url = window.location.search;
+   const urlParams = new URLSearchParams(url);
+   //const roomnum = urlParams.get('roomnum');
+   const roomnum = props.roomnum;
+
    return (
       <>
          <div className="chatmain">
@@ -22,6 +27,8 @@ function ChatMain(props) {
                   // username={props.match.params.username}
                   // roomname={props.match.params.roomname}
                   socket={socket}
+                  roomname= {props.match.params.roomname}
+                  id={props.token}
                />
             </div>
             <div className="right">

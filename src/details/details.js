@@ -73,7 +73,6 @@ function Details(props) {
             } else {
                //if no chatroom is found we create the chatroom and go to the new chatroom 
                CreateChatRoom(user1, user2);
-               history.push("/profile");
             }
          })
    }
@@ -91,17 +90,10 @@ function Details(props) {
             return data.json();
          }).then(dataJson => {
             console.log(dataJson);
-            //if chatroom is found we go to chatroom with the chatroom open
-            // if (dataJson.length > 0) {
-            //    var room = dataJson[0].chatroomid
-            //    console.log("ROOM" + room);
-            //    history.push(`/chat/${room}`);
-
-            // } else {
-            //    //if no chatroom is found we create the chatroom and go to the new chatroom 
-               
-            //    history.push("/profile");
-            // }
+            var room = dataJson;
+               console.log("ROOM" + room);
+               history.push(`/chat/${room}`);
+            
          })
    }
 

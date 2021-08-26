@@ -73,7 +73,7 @@ app.post('/newUser', (req, res) => {
    var username = req.body.username;
    var password = req.body.password;
    var email = req.body.email;
-   
+
    //insert a new user into user table
    db.query(`INSERT INTO users(username, password) VALUES (?,?);`,
       [username, password],
@@ -90,32 +90,61 @@ app.post('/newUser', (req, res) => {
                   if (err) {
                      console.log(err)
                      return console.error(err.message);
-                  } else{
+                  } else {
                      //var info = (JSON.stringify(result[0]));
                      res.send(result);
-                  } 
+                  }
                });
-         } 
+         }
       });
 });
 
 app.post('/getUserChatrooms', (req, res) => {
-   var id = req.body.id;
+   var id = req.body.id[0].id;
    //get profile info query
-   db.query(`SELECT id, name, email  FROM userprofile WHERE id = ?`,
+   db.query(`SELECT chatroomid FROM userchatrooms WHERE userid = ?`,
       [id],
       (err, result) => {
          if (err) {
             console.log(err)
             return console.error(err.message);
          } else if (result.length > 0) {
-            var info = (JSON.stringify(result[0]));
+            var info = (JSON.stringify(result));
             res.send(info);
          } else {
             console.log(result);
             res.json("incorrect username or password")
          }
          res.end();
+      });
+});
+
+app.post('/createchatroom', (req, res) => {
+   var user1id = req.body.user1id.user1;
+   var user2id = req.body.user2id.user2;
+   console.log(user1id[0].id);
+   console.log(user2id);
+
+   db.query(`INSERT INTO chatrooms (size) VALUES (2);`,
+      [],
+      (err, result) => {
+         if (err) {
+            console.log(err);
+         } else {
+            var returnid = (result.insertId);
+            db.query(`INSERT INTO userchatrooms (userid, chatroomid) VALUES (?, ?);
+                      INSERT INTO userchatrooms (userid, chatroomid) VALUES (?, ?);`,
+               [user1id[0].id, returnid, user2id, returnid],
+               (err, result) => {
+                  if (err) {
+                     console.log(err);
+                  } else {
+                     res.json(returnid);
+                     console.log("test: " + returnid);
+                  }
+                 
+               });
+         }
       });
 });
 
@@ -237,16 +266,27 @@ io.on("connection", (socket) => {
       });
    });
 
-   socket.on("chat", (text) => {
-      const p_user = getCurrentUser(socket.id);
-      if (p_user) {
+   socket.on("chat", (req) => {
+      const userinfo = req;
+       
+      if (userinfo) {
          console.log("chat hit");
-         io.in(p_user.roomNum).emit("message", {
-            userId: p_user.userId,
-            username: p_user.username,
-            text: text,
+         console.log(userinfo);
+         io.in(userinfo.room).emit("message", {
+            userId: userinfo.id,
+            room: userinfo.room,
+            text: userinfo.messageEncrypted
          });
       }
+      // const p_user = getCurrentUser(socket.id);
+      // if (p_user) {
+      //    console.log("chat hit");
+      //    io.in(p_user.roomNum).emit("message", {
+      //       userId: p_user.userId,
+      //       username: p_user.username,
+      //       text: text,
+      //    });
+      // }
    });
 
    socket.on("disconnect", () => {

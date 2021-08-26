@@ -62,9 +62,11 @@ function App() {
             <Route path="/details">
                <Details token={token}></Details>
             </Route>
-            <Route path="/chat">
-               <ChatMain socket={socket} token={token}></ChatMain>
+            <Route path="/chat/:roomname" component={(props) => <ChatMain{...props} token={token}></ChatMain>}>
             </Route>
+            {/* <Route path="/chat/:roomname" exact>
+               <ChatMain socket={socket} token={token}></ChatMain>
+            </Route> */}
             <Route exact path="/logout">
                {/* <Register component={Register}></Register> */}
             </Route>
