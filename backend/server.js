@@ -68,25 +68,37 @@ app.post('/getProfileInfo', (req, res) => {
          res.end();
       });
 });
+
 app.post('/newUser', (req, res) => {
-   var id = req.body.id;
-   //get profile info query
-   db.query(`SELECT id, name, email  FROM userprofile WHERE id = ?`,
-      [id],
+   var username = req.body.username;
+   var password = req.body.password;
+   var email = req.body.email;
+   
+   //insert a new user into user table
+   db.query(`INSERT INTO users(username, password) VALUES (?,?);`,
+      [username, password],
       (err, result) => {
          if (err) {
             console.log(err)
             return console.error(err.message);
-         } else if (result.length > 0) {
-            var info = (JSON.stringify(result[0]));
-            res.send(info);
          } else {
-            console.log(result);
-            res.json("incorrect username or password")
-         }
-         res.end();
+            var returnid = (result.insertId);
+            console.log(returnid);
+            db.query(`INSERT INTO userprofile(id, email) VALUES (?, ?);`,
+               [returnid, email],
+               (err, result) => {
+                  if (err) {
+                     console.log(err)
+                     return console.error(err.message);
+                  } else{
+                     //var info = (JSON.stringify(result[0]));
+                     res.send(result);
+                  } 
+               });
+         } 
       });
 });
+
 app.post('/getUserChatrooms', (req, res) => {
    var id = req.body.id;
    //get profile info query
