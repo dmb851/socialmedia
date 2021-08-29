@@ -4,9 +4,9 @@ import Header from "../parts/header"
 import { Link } from "react-router-dom";
 import { Container, Button, Row, Col } from 'react-bootstrap';
 
-function Homepage({ socket }) {
+function Homepage(props) {
 
-   
+
    async function getAllProfiles() {
       return fetch('http://localhost:8000/getAllProfiles', {
          method: 'POST',
@@ -28,6 +28,11 @@ function Homepage({ socket }) {
    useEffect(() => {
       getAllProfiles();
    }, [])
+
+   useEffect(() => {
+      console.log(props.chatrooms);
+
+   },[props.chatrooms]);
 
    return (
       <>

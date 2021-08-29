@@ -100,7 +100,9 @@ app.post('/newUser', (req, res) => {
 });
 
 app.post('/getUserChatrooms', (req, res) => {
-   var id = req.body.id[0].id;
+   //var id = req.body.id[0].id;
+   var id = req.body.id;
+   console.log(req.body.id);
    //get profile info query
    db.query(`SELECT chatroomid FROM userchatrooms WHERE userid = ?`,
       [id],
@@ -242,11 +244,25 @@ app.use('/checkchatroomexists', (req, res) => {
          console.log(result);
       });
 });
+app.use('/getUsernameFromId', (req, res) => {
+   var id = req.body.id;
+
+   db.query(`SELECT username FROM users WHERE id = ?`,
+      [id],
+      (err, result) => {
+         if (err) {
+            console.log(err);
+         }
+         res.send(JSON.parse(JSON.stringify(result)));
+         console.log(result);
+      });
+});
 
 
 const io = socket(server);
 
 io.on("connection", (socket) => {
+
 
    socket.on("joinRoom", ({ username, roomname }) => {
       const p_user = joinUser(socket.id, username, roomname);

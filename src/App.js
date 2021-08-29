@@ -20,6 +20,9 @@ const socket = io.connect('/');
 
 function App() {
    const { token, setToken } = useToken();
+   const [userchatrooms, setUserChatrooms] = useState("dog");
+
+
    // if we are not logged in we show the login page
    // todo we should instead show the homepage without the profile features
    if (!token) {
@@ -32,7 +35,7 @@ function App() {
                   <Homepage socket={socket} />
                </Route>
                <Route exact path="/login" >
-                  <Login setToken={setToken} ></Login>
+                  <Login setToken={setToken} setUserChatrooms={setUserChatrooms} ></Login>
                </Route>
                <Route exact path="/register" >
                   <Register />
@@ -50,7 +53,7 @@ function App() {
 
          <Switch>
             <Route exact path="/" >
-               <Homepage socket={socket} />
+               <Homepage socket={socket} chatrooms={userchatrooms} />
             </Route>
             {/* <Route path = "/chat/:roomname/:username" component={Appmain}/> */}
             <Route exact path="/register">
