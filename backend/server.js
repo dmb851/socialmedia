@@ -263,7 +263,6 @@ const io = socket(server);
 
 io.on("connection", (socket) => {
 
-
    socket.on("joinRoom", ({ username, roomname }) => {
       const p_user = joinUser(socket.id, username, roomname);
       console.log(socket.id, "= id");
@@ -308,6 +307,8 @@ io.on("connection", (socket) => {
    socket.on("disconnect", () => {
       console.log("disconnected1");
 
+     // var p_user = userDisconnects(user);
+     console.log("socketid: " + socket.id);
       var p_user = userDisconnects(socket.id);
       //p_user = getCurrentUser(socket.id);
 
