@@ -3,6 +3,7 @@ import './App.scss';
 import ChatMain from "./chatmain/chatmain";
 import Home from "./home/home";
 import Homepage from "./homepage/homepage";
+import joinAllRooms from "./functions";
 import HeaderLogin from "./parts/headerlogin";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import React from "react";
@@ -21,6 +22,40 @@ const socket = io.connect('/');
 function App() {
    const { token, setToken } = useToken();
    const [userchatrooms, setUserChatrooms] = useState("dog");
+
+   async function getUserChatrooms(id) {
+      console.log("id is " + id);
+      const sendId = { id: id };
+
+      return fetch('http://localhost:8000/getUserChatrooms', {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify(sendId)
+      })
+         .then(data => {
+            //props.setUserChatrooms("apple");
+            return data.json();
+         }).then(dataJson => {
+            console.log("DATA JSON: ");
+            console.log(dataJson);
+            setUserChatrooms(dataJson);
+         })
+   }
+
+   useEffect(() => {
+      if(token){
+         getUserChatrooms(token[0].id);
+      }
+   }, [token])
+   
+   useEffect(() => {
+      if(userchatrooms!="dog" && userchatrooms !="" && token){
+         joinAllRooms(socket, userchatrooms, token[0].id);
+
+      }
+   }, [userchatrooms])
 
 
    // if we are not logged in we show the login page
@@ -65,7 +100,7 @@ function App() {
             <Route path="/details">
                <Details token={token}></Details>
             </Route>
-            <Route path="/chat/:roomname" component={(props) => <ChatMain{...props} token={token}></ChatMain>}>
+            <Route path="/chat/:roomname" component={(props) => <ChatMain{...props} token={token} key={socket} socket={socket}></ChatMain>}>
             </Route>
             {/* <Route path="/chat/:roomname" exact>
                <ChatMain socket={socket} token={token}></ChatMain>

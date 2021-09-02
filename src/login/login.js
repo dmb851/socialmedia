@@ -38,11 +38,6 @@ function Login(props) {
    }
 
 
-   async function joinAllRooms(id) {
-      await getUserChatrooms(id);
-
-   }
-
    async function loginUser(credentials) {
       return fetch('http://localhost:8000/login', {
          method: 'POST',
@@ -71,8 +66,6 @@ function Login(props) {
          //login is successful join all chatrooms and redirect to homepage
          //join all chatrooms here
          console.log("Token: " + token.token[0].id);
-         await joinAllRooms(token.token[0].id);
-         props.setUserChatrooms("orange");
          props.setToken(token);
          history.push("/");
       }

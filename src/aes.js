@@ -7,14 +7,18 @@ export const to_Encrypt = (text) =>{
 };
 
 export const to_Decrypt = (cipher, username)=>{
-   if(cipher.startsWith("Welcome")){
+   
+   if(String(cipher).startsWith("Welcome")){
       return cipher;
    }
 
-   if(cipher.startsWith(username)){
+   if(String(cipher).startsWith(username)){
       return cipher;
    }
    
-   var decrypted = aes256.decrypt(secret_key,cipher);
-   return decrypted;
+   if(cipher){
+      var decrypted = aes256.decrypt(secret_key, String(cipher));
+      return decrypted;
+
+   }
 };

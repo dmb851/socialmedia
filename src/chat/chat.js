@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 
 function Chat(props) {
    const [text, setText] = useState("");
-   const [messages, setMessages] = useState([]);
+   const [messages, setMessages] = useState(props.messages);
    const [username, setUsername] = useState([]);
 
    const url = window.location.search;
@@ -27,7 +27,6 @@ function Chat(props) {
          props.socket.emit("joinRoom",  {username, roomnum});
       }
    }
-
 
    async function getUsernameFromId(id) {
       console.log("id is " + id);
@@ -52,26 +51,7 @@ function Chat(props) {
 
    }, [])
 
-   useEffect(() => {
-      props.socket.on("message", (data) => {
-         console.log("hi");
-         //const ans = to_Decrypt(data.text, data.username);
-         const ans = to_Decrypt(data.text, data.username);
-         dispatchProcess(false, ans, data.text);
-         console.log("ans" + ans);
-
-         let temp = messages;
-         temp.push({
-            userId: data.userId,
-            username: data.username,
-            text: ans,
-         });
-
-         setMessages([...temp]);
-
-      });
-
-   }, [props.socket]);
+  
 
    //also send the room of the user
    const sendData = () => {
@@ -79,6 +59,7 @@ function Chat(props) {
          const ans = to_Encrypt(text);
          const sendInfo = { messageEncrypted: { ans }, id: props.id, room: props.roomname };
          console.log(ans);
+         console.log("sendDAta: "+ String(sendInfo.room + " " + sendInfo.id));
          props.socket.emit("chat", sendInfo);
          setText("");
       }
@@ -105,16 +86,16 @@ function Chat(props) {
          </div>
          <div className="chat-message">
             {messages.map((i) => {
-               if (i.username === props.username) {
+               if (i.username != props.roomname) {
                   return (
-                     <div className="message">
+                     <div key={i.text} className="message">
                         <p>{i.text}</p>
                         <span>{i.username}</span>
                      </div>
                   );
                } else {
                   return (
-                     <div className="message mess-right">
+                     <div key={i.text} className="message mess-right">
                         <p>{i.text}</p>
                         <span>{i.username}</span>
                      </div>

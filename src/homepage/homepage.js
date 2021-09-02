@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import { Container, Button, Row, Col } from 'react-bootstrap';
 
 function Homepage(props) {
-
-
    async function getAllProfiles() {
       return fetch('http://localhost:8000/getAllProfiles', {
          method: 'POST',
@@ -29,10 +27,6 @@ function Homepage(props) {
       getAllProfiles();
    }, [])
 
-   useEffect(() => {
-      console.log(props.chatrooms);
-
-   },[props.chatrooms]);
 
    return (
       <>

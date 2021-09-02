@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
+const app = express();
 const socket = require("socket.io");
 const color = require("colors");
-const app = express();
 const db = require('./db');
 const bcrypt = require('bcrypt');
 const { joinUser, getCurrentUser, userDisconnects } = require("./testChat");
 const bodyParser = require("body-parser");
+
 
 const port = 8000;
 app.use(express());
@@ -144,7 +145,7 @@ app.post('/createchatroom', (req, res) => {
                      res.json(returnid);
                      console.log("test: " + returnid);
                   }
-                 
+
                });
          }
       });
@@ -254,7 +255,7 @@ app.use('/getUsernameFromId', (req, res) => {
             console.log(err);
          }
          res.send(JSON.parse(JSON.stringify(result)));
-         console.log(result);
+         console.log("RESULT: " + result);
       });
 });
 
@@ -266,7 +267,9 @@ io.on("connection", (socket) => {
    socket.on("joinRoom", ({ username, roomname }) => {
       const p_user = joinUser(socket.id, username, roomname);
       console.log(socket.id, "= id");
-      socket.join(p_user.roomNum);
+      console.log("roomname: "+ p_user.roomNum);
+      socket.join(String(p_user.roomNum));
+      //console.log(io.sockets.sockets);
 
       socket.emit("message", {
          userId: p_user.userId,
@@ -274,24 +277,26 @@ io.on("connection", (socket) => {
          text: `Welcome ${p_user.username}`,
       });
 
-      socket.broadcast.to(p_user.roomNum).emit("message", {
+      socket.broadcast.to(String(p_user.roomNum)).emit("message", {
          userId: p_user.userId,
          username: p_user.username,
          text: `${p_user.username} has joined the chat`,
       });
    });
-
+  
    socket.on("chat", (req) => {
       const userinfo = req;
-       
+
       if (userinfo) {
          console.log("chat hit");
-         console.log(userinfo);
-         io.in(userinfo.room).emit("message", {
+         console.log(userinfo.room);
+
+         io.in(String(userinfo.room)).emit("message", {
             userId: userinfo.id,
             room: userinfo.room,
             text: userinfo.messageEncrypted
          });
+        
       }
       // const p_user = getCurrentUser(socket.id);
       // if (p_user) {
@@ -307,8 +312,8 @@ io.on("connection", (socket) => {
    socket.on("disconnect", () => {
       console.log("disconnected1");
 
-     // var p_user = userDisconnects(user);
-     console.log("socketid: " + socket.id);
+      // var p_user = userDisconnects(user);
+      console.log("socketid: " + socket.id);
       var p_user = userDisconnects(socket.id);
       //p_user = getCurrentUser(socket.id);
 
